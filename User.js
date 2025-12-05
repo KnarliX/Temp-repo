@@ -1,90 +1,90 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-    discordId: {
+    discordId: { // discord data
         type: String,
         required: true,
         unique: true,
         index: true
     },
-    username: {
+    username: {  // discord data (dc username)
         type: String,
         required: true
     },
-    youtubeChannelId: {
+    youtubeChannelId: { // user's yt channel Id (public data)
         type: String,
         default: null
     },
-    youtubeChannelName: {
+    youtubeChannelName: { // user's yt channel Name (public data)
         type: String,
         default: null
     },
-    youtubeChannelImage: {
+    youtubeChannelImage: { // user's yt channel logo url (public data)
         type: String,
         default: null
     },
-    youtubeBannerImage: {
+    youtubeBannerImage: { // user's yt channel banner img url (public data)
         type: String,
         default: null
     },
-    accessToken: {
+    accessToken: { // Google oauth accessToken (encrypted)
         type: String,
         default: null
     },
-    refreshToken: {
+    refreshToken: { // Google oauth refreshToken (encrypted)
         type: String,
         default: null
     },
-    tokenExpiry: {
+    tokenExpiry: { // token expiry date
         type: Date,
         default: null
     },
-    subscriptionStatus: {
+    subscriptionStatus: { // if user subscribed janvi Dreamer it is true else false 
         type: Boolean,
         default: false
     },
-    membershipStatus: {
+    membershipStatus: { // if user is a paid member of janvi's yt channel
         type: String,
         enum: ['none', 'TIER1', 'TIER2', 'TIER3'],
         default: 'none'
     },
-    membershipTier: {
+    membershipTier: { if // user is a paid member of janvi's yt channel
         type: String,
         default: null
     },
-    roles: [{
+    roles: [{ // Which role does the user get after verification
         type: String
     }],
-    lastRoleUpdate: {
+    lastRoleUpdate: { // last role update date
         type: Date,
         default: Date.now
     },
-    OAuth2Disconnected: {
+    OAuth2Disconnected: { // if user revoke access form myaccount.google.com/permissions our system detect this (our system scan all users in every 8 hours) system marked OAuth2Disconnected true and our db cleaning system (running in every 12h) will delete all data permanently
         type: Boolean,
         default: false
     },
-    verificationAttempts: {
+    verificationAttempts: { // How many times a user visits the website to verify with a verification token (not a Google data) 
         type: Number,
         default: 0
     },
-    verificationStatus: {
+    verificationStatus: { // no Google data
         type: String,
         enum: ['pending', 'verified', 'expired'],
         default: 'pending'
     },
-    lastScanned: {
+    lastScanned: { // last scan time 
         type: Date,
         default: Date.now
     },
-    displayName: {
+    displayName: { // User's discord display name
         type: String,
         default: null
     },
-    avatarUrl: {
+    avatarUrl: { // it is always null
         type: String,
         default: null
     },
-    createdAt: {
+    createdAt: { // verified time
         type: Date,
         default: Date.now
     }
