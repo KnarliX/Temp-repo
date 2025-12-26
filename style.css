@@ -1,0 +1,174 @@
+:root {
+    --bg-body: #2b2d31;      /* Dark background */
+    --bg-card: #313338;      /* Discord Card Color */
+    --input-bg: #1e1f22;     /* Darker Input */
+    --accent: #5865F2;       /* Discord Blurple */
+    --accent-hover: #4752c4;
+    --text-main: #f2f3f5;
+    --text-muted: #b5bac1;
+    --border: #1e1f22;
+    --success: #23a559;
+    --error: #fa777c;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* The Main Box */
+.card {
+    background-color: var(--bg-card);
+    width: 100%;
+    max-width: 420px;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    color: var(--text-main);
+}
+
+/* Input Group (Input + Paste Button) */
+.input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 12px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 4px;
+    outline: none;
+    font-size: 0.95rem;
+}
+
+input[type="text"]:focus {
+    border-color: var(--accent);
+}
+
+#pasteBtn {
+    padding: 0 15px;
+    background-color: #4e5058;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+#pasteBtn:hover {
+    background-color: #6d6f78;
+}
+
+/* Controls */
+.controls-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: flex-end;
+}
+
+.select-wrapper {
+    flex: 1;
+    text-align: left;
+}
+
+.select-wrapper label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--input-bg);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+}
+
+.btn-download {
+    flex: 2;
+    padding: 11px;
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+    height: 42px; /* Match select height */
+}
+
+.btn-download:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-download:disabled {
+    background-color: #3b3d44;
+    color: #787a81;
+    cursor: not-allowed;
+}
+
+/* Preview Area */
+.preview-area {
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    border: 2px dashed #3f4147;
+    overflow: hidden;
+}
+
+#preview-img {
+    max-height: 80px;
+    max-width: 80px;
+    display: none; /* Hidden initially */
+}
+
+#placeholder-text {
+    color: #5c5e66;
+    font-size: 0.9rem;
+}
+
+/* Status Text */
+#status {
+    height: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.text-success { color: var(--success); }
+.text-error { color: var(--error); }
