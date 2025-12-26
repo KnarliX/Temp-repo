@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Emoji Downloader</title>
+    <style>
+        /* CSS: Dark Theme Styling */
+        :root {
+            --bg-color: #2b2d31; /* Discord Dark Background */
+            --container-bg: #313338;
+            --accent-color: #5865F2; /* Discord Blurple */
+            --text-color: #f2f3f5;
+            --input-bg: #1e1f22;
+            --border-color: #1e1f22;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: white;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-paste {
+            background-color: #4f545c;
+            color: white;
+        }
+
+        .btn-paste:hover {
+            background-color: #686d73;
+        }
+
+        .options-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #b5bac1;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: white;
+            border: 1px solid var(--border-color);
+            outline: none;
+        }
+
+        .btn-download {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 1rem;
+            padding: 12px;
+        }
+
+        .btn-download:hover {
+            background-color: #4752c4;
+        }
+
+        .btn-download:disabled {
+            background-color: #3b4048;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            height: 20px;
+        }
+
+        .error { color: #fa777c; }
+        .success { color: #57f287; }
+
+        /* Preview Image Style */
+        #preview-container {
+            margin-top: 15px;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #preview-img {
+            max-width: 64px;
+            max-height: 64px;
+            display: none; /* Hidden by default */
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Emoji Downloader</h2>
+
+        <div class="input-group">
+            <input type="text" id="emojiInput" placeholder="Paste ID or Emoji here...">
+            <button class="btn-paste" onclick="pasteText()">Paste</button>
+        </div>
+
+        <div class="options-group">
+            <label for="formatSelect">Select Format:</label>
+            <select id="formatSelect">
+                <option value="png" selected>PNG (Default)</option>
+                <option value="gif">GIF (For animated)</option>
+                <option value="webp">WebP</option>
+            </select>
+        </div>
+        
+        <button class="btn-download" id="downloadBtn" onclick="processAndDownload()">Download Emoji</button>
+
+        <div id="preview-container">
+            <img id="preview-img" alt="Preview" />
+        </div>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Paste Button Functionality
+        async function pasteText() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('emojiInput').value = text;
+                showStatus("Text pasted!", "success");
+            } catch (err) {
+                showStatus("Failed to read clipboard.", "error");
+            }
+        }
+
+        // Main Logic
+        async function processAndDownload() {
+            const inputVal = document.getElementById('emojiInput').value.trim();
+            const format = document.getElementById('formatSelect').value;
+            const btn = document.getElementById('downloadBtn');
+            const previewImg = document.getElementById('preview-img');
+
+            if (!inputVal) {
+                showStatus("Please enter an ID or Emoji.", "error");
+                return;
+            }
+
+            // REGEX: 17 se 20 digits ka number dhundega string me kahi bhi
+            // Chahe wo sirf ID ho ya <a:name:ID> format ho.
+            const idMatch = inputVal.match(/(\d{17,20})/);
+
+            if (!idMatch) {
+                showStatus("No valid Emoji ID found!", "error");
+                return;
+            }
+
+            const emojiId = idMatch[0]; // Extracted ID
+            const url = `https://cdn.discordapp.com/emojis/${emojiId}.${format}`; // URL Format jo aapne maanga
+            
+            // UI Update
+            btn.disabled = true;
+            btn.innerText = "Downloading...";
+            showStatus("Fetching image...", "success");
+
+            // Preview dikhana
+            previewImg.src = url;
+            previewImg.style.display = "block";
+
+            try {
+                // Fetch karke blob banana taaki direct download force kar sakein
+                const response = await fetch(url);
+                
+                if (!response.ok) throw new Error("Image not found (404)");
+
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+
+                // Temporary link bana kar click karwana
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = `emoji_${emojiId}.${format}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Cleanup
+                window.URL.revokeObjectURL(blobUrl);
+                showStatus("Download Started!", "success");
+
+            } catch (error) {
+                console.error(error);
+                showStatus("Error: Invalid ID or Image not found.", "error");
+                previewImg.style.display = "none";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Download Emoji";
+            }
+        }
+
+        // Helper to show messages
+        function showStatus(msg, type) {
+            const el = document.getElementById('status');
+            el.innerText = msg;
+            el.className = type;
+            setTimeout(() => {
+                el.innerText = "";
+                el.className = "";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
