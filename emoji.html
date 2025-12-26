@@ -3,253 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Discord Emoji Downloader</title>
+    <title>Discord Emoji Downloader</title>
     <style>
-        /* CSS: Dark Theme Styling (Same as before) */
+        /* === RESET & VARIABLES === */
         :root {
-            --bg-color: #2b2d31;
-            --container-bg: #313338;
-            --accent-color: #5865F2;
-            --text-color: #f2f3f5;
-            --input-bg: #1e1f22;
-            --border-color: #1e1f22;
+            --bg-primary: #313338;
+            --bg-secondary: #2b2d31;
+            --input-bg: #383a40;
+            --accent: #5865F2;
+            --accent-hover: #4752c4;
+            --text-main: #f2f3f5;
+            --text-muted: #b5bac1;
+            --success: #23a559;
+            --danger: #fa777c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: 'gg sans', 'Segoe UI', Tahoma, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
             height: 100vh;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
-        .container {
-            background-color: var(--container-bg);
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        /* === MAIN LAYOUT === */
+        .wrapper {
             width: 100%;
-            max-width: 400px;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
             text-align: center;
         }
 
-        h2 { margin-bottom: 1.5rem; color: var(--text-color); }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
 
-        .input-group {
+        /* === PREVIEW SECTION === */
+        .preview-area {
+            height: 120px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .preview-box {
+            position: relative;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            /* Subtle glow effect instead of hard shadow */
+            box-shadow: 0 0 0 0 transparent; 
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: none; /* Hidden initially */
+        }
+        
+        .preview-box.active {
+            display: block;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+        }
+
+        #preview-img {
+            max-width: 96px;
+            max-height: 96px;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* === INPUT STYLING (Discord Chat Bar Style) === */
+        .input-container {
+            position: relative;
+            width: 100%;
         }
 
         input[type="text"] {
-            flex-grow: 1;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
+            width: 100%;
+            padding: 16px;
+            padding-right: 50px; /* Space for paste icon if needed */
             background-color: var(--input-bg);
-            color: white;
-            outline: none;
-        }
-
-        button {
-            padding: 10px 15px;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: box-shadow 0.2s;
         }
 
-        .btn-paste { background-color: #4f545c; color: white; }
-        .btn-paste:hover { background-color: #686d73; }
+        input[type="text"]:focus {
+            box-shadow: 0 0 0 2px var(--accent);
+        }
 
-        .options-group { margin-bottom: 1.5rem; text-align: left; }
-
-        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #b5bac1; }
+        /* === CONTROLS === */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 2fr; /* 1/3 for select, 2/3 for button */
+            gap: 10px;
+        }
 
         select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 4px;
-            background-color: var(--input-bg);
-            color: white;
-            border: 1px solid var(--border-color);
+            padding: 14px;
+            background-color: var(--bg-secondary);
+            color: var(--text-main);
+            border: 1px solid var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
             outline: none;
+        }
+
+        select:focus {
+            border-color: var(--accent);
         }
 
         .btn-download {
-            width: 100%;
-            background-color: var(--accent-color);
+            background-color: var(--accent);
             color: white;
+            border: none;
+            border-radius: 8px;
             font-size: 1rem;
-            padding: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
         }
-        .btn-download:hover { background-color: #4752c4; }
-        .btn-download:disabled { background-color: #3b4048; cursor: not-allowed; opacity: 0.7; }
 
-        #status { margin-top: 10px; font-size: 0.9rem; height: 20px; }
-        .error { color: #fa777c; }
-        .success { color: #57f287; }
+        .btn-download:hover {
+            background-color: var(--accent-hover);
+        }
 
-        #preview-container {
+        .btn-download:active {
+            transform: scale(0.98);
+        }
+
+        .btn-download:disabled {
+            background-color: #3b3d44;
+            color: #787a81;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* === STATUS TOAST === */
+        #status {
             margin-top: 15px;
-            min-height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-size: 0.9rem;
+            min-height: 20px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        
-        #preview-img {
-            max-width: 64px;
-            max-height: 64px;
-            display: none;
-            border-radius: 4px;
+        #status.visible { opacity: 1; }
+        .text-error { color: var(--danger); }
+        .text-success { color: var(--success); }
+
+        /* Mobile Optimization */
+        @media (max-width: 400px) {
+            .controls {
+                grid-template-columns: 1fr; /* Stack on very small screens */
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Emoji Downloader</h2>
+    <div class="wrapper">
+        <h1>Emoji Downloader</h1>
 
-        <div class="input-group">
-            <input type="text" id="emojiInput" placeholder="Paste ID or Tag here..." oninput="detectFormat()">
-            <button class="btn-paste" onclick="pasteText()">Paste</button>
+        <div class="preview-area">
+            <div class="preview-box" id="previewBox">
+                <img id="preview-img" src="" alt="Emoji Preview">
+            </div>
         </div>
 
-        <div class="options-group">
-            <label for="formatSelect">Select Format:</label>
+        <div class="input-container">
+            <input type="text" id="emojiInput" placeholder="Paste ID or <a:emoji:id> here..." autocomplete="off">
+        </div>
+
+        <div class="controls">
             <select id="formatSelect">
-                <option value="png">PNG (Static)</option>
-                <option value="gif">GIF (Animated)</option>
+                <option value="smart" selected>✨ Smart</option>
+                <option value="png">PNG</option>
+                <option value="gif">GIF</option>
                 <option value="webp">WebP</option>
             </select>
+            <button class="btn-download" id="downloadBtn" onclick="downloadImage()">Download</button>
         </div>
-        
-        <button class="btn-download" id="downloadBtn" onclick="processAndDownload()">Download Emoji</button>
 
-        <div id="preview-container">
-            <img id="preview-img" alt="Preview" />
-        </div>
         <div id="status"></div>
     </div>
 
     <script>
-        // Regex logic samajhne ke liye:
-        // Group 1 (a?): Check karega 'a' hai ya nahi (Animation check)
-        // Group 2 ([\w-]+): Name uthayega (Filename ke liye)
-        // Group 3 (\d{17,20}): ID uthayega (Download link ke liye)
-        const fullTagRegex = /<(a?):([\w-]+):(\d{17,20})>/;
-        const simpleIdRegex = /(\d{17,20})/;
+        // --- VARIABLES ---
+        const inputEl = document.getElementById('emojiInput');
+        const selectEl = document.getElementById('formatSelect');
+        const previewBox = document.getElementById('previewBox');
+        const previewImg = document.getElementById('preview-img');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const statusEl = document.getElementById('status');
 
-        async function pasteText() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('emojiInput').value = text;
-                showStatus("Pasted!", "success");
-                detectFormat(); // Paste karte hi format check karo
-            } catch (err) {
-                showStatus("Clipboard permission denied.", "error");
-            }
-        }
+        // Regex
+        // Group 1: 'a' if animated
+        // Group 2: Name
+        // Group 3: ID
+        const regexFull = /<(a?):([\w-]+):(\d{17,20})>/;
+        const regexId = /(\d{17,20})/;
 
-        // Ye function automatic format change karega
-        function detectFormat() {
-            const inputVal = document.getElementById('emojiInput').value.trim();
-            const formatSelect = document.getElementById('formatSelect');
-            const match = inputVal.match(fullTagRegex);
+        // State Store (Global variables to hold current valid data)
+        let currentUrl = null;
+        let currentFilename = null;
+        let currentFormat = null;
 
-            if (match) {
-                // match[1] me ya to 'a' hoga ya empty string
-                if (match[1] === 'a') {
-                    formatSelect.value = 'gif'; // Animated hai to GIF
-                } else {
-                    formatSelect.value = 'png'; // Normal hai to PNG
-                }
-            }
-            // Agar sirf ID hai to purana default hi rehne do (change mat karo)
-        }
+        // --- EVENT LISTENERS ---
+        
+        // Input change hote hi preview update karo
+        inputEl.addEventListener('input', updatePreview);
+        
+        // Agar user format change kare tab bhi preview update karo
+        selectEl.addEventListener('change', updatePreview);
 
-        async function processAndDownload() {
-            const inputVal = document.getElementById('emojiInput').value.trim();
-            const format = document.getElementById('formatSelect').value;
-            const btn = document.getElementById('downloadBtn');
-            const previewImg = document.getElementById('preview-img');
+        // --- CORE LOGIC ---
 
-            if (!inputVal) {
-                showStatus("Please enter text first.", "error");
-                return;
-            }
-
-            let emojiId = "";
-            let filename = "";
-
-            // Check 1: Kya ye full tag hai? <a:name:id>
-            const fullMatch = inputVal.match(fullTagRegex);
+        function updatePreview() {
+            const rawText = inputEl.value.trim();
+            const selectedMode = selectEl.value;
             
-            // Check 2: Kya ye sirf ID hai?
-            const idMatch = inputVal.match(simpleIdRegex);
+            // Reset State
+            currentUrl = null;
+            previewBox.classList.remove('active');
+            downloadBtn.disabled = true;
+            statusEl.className = '';
+            statusEl.innerText = '';
+            statusEl.classList.remove('visible');
+
+            if (!rawText) return;
+
+            let id = "";
+            let name = "";
+            let isAnimated = false;
+
+            // 1. Analyze Input
+            const fullMatch = rawText.match(regexFull);
+            const idMatch = rawText.match(regexId);
 
             if (fullMatch) {
-                // Tag se data nikalo
-                const name = fullMatch[2]; // Name from tag
-                emojiId = fullMatch[3];    // ID from tag
-                filename = name;           // Filename wahi rakho jo tag me hai
+                isAnimated = (fullMatch[1] === 'a');
+                name = fullMatch[2];
+                id = fullMatch[3];
             } else if (idMatch) {
-                // Sirf ID mili
-                emojiId = idMatch[0];
-                filename = `emoji_${emojiId}`; // Default filename
+                id = idMatch[0];
+                name = `emoji_${id}`;
+                // ID only me hum animated assume nahi kar sakte unless check karein,
+                // par Discord logic ke hisab se default png rakhenge.
             } else {
-                showStatus("Invalid ID or Format!", "error");
-                return;
+                return; // No valid ID found yet
             }
 
-            // Download Logic starts here
-            const url = `https://cdn.discordapp.com/emojis/${emojiId}.${format}`;
+            // 2. Determine Format
+            let finalFormat = 'png'; // Fallback
+
+            if (selectedMode === 'smart') {
+                if (isAnimated) {
+                    finalFormat = 'gif';
+                } else {
+                    finalFormat = 'png';
+                }
+            } else {
+                finalFormat = selectedMode; // User override
+            }
+
+            // 3. Update State
+            currentFilename = `${name}.${finalFormat}`;
+            currentUrl = `https://cdn.discordapp.com/emojis/${id}.${finalFormat}`;
+            currentFormat = finalFormat;
+
+            // 4. Update UI
+            previewImg.src = currentUrl;
             
-            btn.disabled = true;
-            btn.innerText = "Downloading...";
-            previewImg.src = url;
-            previewImg.style.display = "block";
+            // Image load hone par hi box dikhao
+            previewImg.onload = function() {
+                previewBox.classList.add('active');
+                downloadBtn.disabled = false;
+            };
+
+            previewImg.onerror = function() {
+                previewBox.classList.remove('active');
+                downloadBtn.disabled = true;
+            };
+        }
+
+        // --- DOWNLOAD LOGIC ---
+        async function downloadImage() {
+            if (!currentUrl) return;
+
+            const btnOriginalText = downloadBtn.innerText;
+            downloadBtn.innerText = "Fetching...";
+            downloadBtn.disabled = true;
 
             try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("404 Not Found");
-
+                const response = await fetch(currentUrl);
+                if (!response.ok) throw new Error("Network response was not ok");
+                
                 const blob = await response.blob();
                 const blobUrl = window.URL.createObjectURL(blob);
 
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                // Filename + Format (Example: discord_loading.gif)
-                link.download = `${filename}.${format}`; 
+                link.download = currentFilename;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
                 window.URL.revokeObjectURL(blobUrl);
-                showStatus("Downloaded: " + filename, "success");
+                showStatus("Download Started!", "success");
 
             } catch (error) {
                 console.error(error);
-                showStatus("Image not found or Invalid ID.", "error");
-                previewImg.style.display = "none";
+                showStatus("Failed to download. Link expired or invalid.", "error");
             } finally {
-                btn.disabled = false;
-                btn.innerText = "Download Emoji";
+                downloadBtn.innerText = btnOriginalText;
+                downloadBtn.disabled = false;
             }
         }
 
         function showStatus(msg, type) {
-            const el = document.getElementById('status');
-            el.innerText = msg;
-            el.className = type;
+            statusEl.innerText = msg;
+            statusEl.className = type === 'error' ? 'text-error' : 'text-success';
+            statusEl.classList.add('visible');
+            
+            // 3 sec baad hata do
             setTimeout(() => {
-                el.innerText = "";
-                el.className = "";
+                statusEl.classList.remove('visible');
             }, 3000);
         }
     </script>
