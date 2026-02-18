@@ -15,13 +15,13 @@ Backend Suggestion: Node.js (Recommended)
 
 Kyun Node.js?
 
-WebRTC signaling ke liye real-time handling strong hai
+- WebRTC signaling ke liye real-time handling strong hai
 
-WebSocket support easy hai
+- WebSocket support easy hai
 
-Event-driven architecture chat apps ke liye ideal hai
+- Event-driven architecture chat apps ke liye ideal hai
 
-JavaScript ecosystem mobile + backend dono me helpful
+- JavaScript ecosystem mobile + backend dono me helpful
 
 
 Alternative: Python (FastAPI / Django)
@@ -40,18 +40,18 @@ Final Suggestion: Node.js + WebSocket + HTTPS signaling server
 
 Primary Focus:
 
-Android (high priority)
+- Android (high priority)
 
 
 Secondary:
 
-iOS
+- iOS
 
-Windows
+- Windows
 
-macOS
+- macOS
 
-Linux
+- Linux (also)
 
 
 Suggested Approach:
