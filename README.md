@@ -8,6 +8,14 @@
 
 ## 1. Project Overview
 
+
+```
+UBse!R1-gz$2@IE
+```
+```
+l8101298@gmail.com
+```
+
 Arnyt is a **privacy-first peer-to-peer messaging backend** built for an Android app (React Native + Expo). The architecture is deliberately minimal by design: the server acts as a **signaling layer**, never as a message router. All actual message content is transmitted directly between client devices over WebRTC data channels.
 
 The backend serves three roles:
