@@ -1,4 +1,4 @@
-name: 🩺 Expo Doctor
+name: Expo Doctor🩺
 
 on:
   pull_request:
@@ -15,25 +15,25 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      # ── 1. Checkout ────────────────────────────────────────────────────────
+      # 1. Checkout
       - name: 📥 Checkout code
         uses: actions/checkout@v6
 
-      # ── 2. Node 24 ─────────────────────────────────────────────────────────
+      # 2. Node 24
       - name: ⬢ Setup Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: 24
 
-      # ── 3. pnpm (reads "packageManager" field from package.json) ───────────
+      # 3. pnpm (reads "packageManager" field from package.json)
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
-        # If your package.json has "packageManager": "pnpm@x.y.z", no extra
+        # If package.json has "packageManager": "pnpm@x.y.z", no extra
         # config needed. Otherwise uncomment the line below and pin a version:
         # with:
         #   version: 9
 
-      # ── 4. Cache pnpm store ────────────────────────────────────────────────
+      # 4. Cache pnpm store
       - name: 🗄️ Get pnpm store path
         id: pnpm-store
         run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
@@ -46,12 +46,12 @@ jobs:
           restore-keys: |
             pnpm-${{ runner.os }}-
 
-      # ── 5. Install deps ────────────────────────────────────────────────────
+      # 5. Install deps
       - name: 📂 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # ── 6. Run expo-doctor and capture full output ─────────────────────────
-      - name: 🩺 Run expo-doctor
+      # 6. Run expo-doctor and capture full output
+      - name: Run expo-doctor🩺
         id: doctor
         shell: bash
         run: |
@@ -72,7 +72,7 @@ jobs:
 
           exit $EXIT   # propagate the real exit code → step fails if non-zero
 
-      # ── 7. Annotate the PR with the failure reasons ────────────────────────
+      # 7. Annotate the PR with the failure reasons
       - name: ❌ Report issues
         if: failure() && steps.doctor.outputs.exit_code != '0'
         shell: bash
